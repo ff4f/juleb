@@ -12,3 +12,17 @@ class PickingType(models.Model):
                 vals['name'] = translation.value
 
         return super(PickingType, self).create(vals)
+    
+    
+    def change_translation_name(self, lang):
+        if self.company_id.lang is not 'en_US' and lang != 'en_US':
+            translation = self.env['ir.translation'].sudo().search([('value','=',self.name),('lang','=',self.company_id.lang)],limit=1)
+            if translation:
+                value = self.env['ir.translation'].sudo().search([('src','=',translation.src),('lang','=',lang)],limit=1).value
+                self.name = value
+        else:
+            # translation = self.env['ir.translation'].sudo().search([('src','=',self.name),('lang','=',lang)],limit=1)
+            translation = self.env['ir.translation'].sudo().search([('value','=',self.name),('lang','=',self.company_id.lang)],limit=1)
+            if translation:
+                self.name = translation.src
+        return True
